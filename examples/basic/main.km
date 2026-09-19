@@ -1,0 +1,36 @@
+import { Command, Flag, IntegerRange, RequiredText, Text } from "../../cli";
+import go fmt from "fmt";
+import go os from "os";
+import go strings from "strings";
+
+function main(): void {
+  const command = new Command("greeter", "Print a configurable greeting");
+  command.setVersion("0.1.0");
+  command.option(Flag("loud", "l", "Use uppercase output"));
+  command.option(Text("greeting", "g", "Greeting text", "Hello"));
+  command.option(IntegerRange("count", "c", "Number of greetings", 1, 1, 100));
+  command.option(RequiredText("name", "n", "Name to greet"));
+
+  const [parsed, err] = command.parse(os.Args[1:]);
+  if (err !== nil) {
+    fmt.Fprintln(os.Stderr, "error:", err.Error());
+    fmt.Fprint(os.Stderr, command.help());
+    os.Exit(2);
+  }
+  if (parsed.helpRequested) {
+    fmt.Print(command.help());
+    return;
+  }
+  if (parsed.versionRequested) {
+    fmt.Println("greeter 0.1.0");
+    return;
+  }
+
+  let greeting = parsed.text("greeting");
+  if (parsed.flag("loud")) {
+    greeting = strings.ToUpper(greeting);
+  }
+  for (let index = 0; index < parsed.integer("count"); index++) {
+    fmt.Printf("%s, %s!\n", greeting, parsed.text("name"));
+  }
+}

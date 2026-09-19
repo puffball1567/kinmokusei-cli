@@ -1,0 +1,5 @@
+.kinmokusei/
+dist/
+coverage/
+*.exe
+

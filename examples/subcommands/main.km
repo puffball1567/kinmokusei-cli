@@ -1,0 +1,40 @@
+import { Command, TextList } from "../../cli";
+import go fmt from "fmt";
+import go os from "os";
+
+function main(): void {
+  const command = new Command("packages", "Manage example packages");
+  command.setVersion("0.1.0");
+
+  const add = new Command("add", "Add one or more packages");
+  add.setArgumentRange(1, -1);
+  add.option(TextList("tag", "t", "Attach a tag"));
+  command.subcommand(add);
+
+  const [parsed, err] = command.parse(os.Args[1:]);
+  if (err !== nil) {
+    fmt.Fprintln(os.Stderr, "error:", err.Error());
+    os.Exit(2);
+  }
+  if (parsed.helpRequested) {
+    if (len(parsed.commandPath) > 1 && parsed.command == "add") {
+      fmt.Print(add.help());
+    } else {
+      fmt.Print(command.help());
+    }
+    return;
+  }
+  if (parsed.versionRequested) {
+    fmt.Println("packages 0.1.0");
+    return;
+  }
+
+  if (parsed.command == "add") {
+    for (const packageName of parsed.positionals) {
+      fmt.Println("add " + packageName);
+    }
+    for (const tag of parsed.texts("tag")) {
+      fmt.Println("tag " + tag);
+    }
+  }
+}

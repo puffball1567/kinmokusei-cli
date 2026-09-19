@@ -1,0 +1,15 @@
+import { Choice, Command, IntegerRange } from "github.com/puffball1567/kinmokusei-cli";
+import go fmt from "fmt";
+
+function main(): void {
+  const command = new Command("consumer", "External package test");
+  command.option(Choice("format", "f", "Output format", ["text", "json"], "text"));
+  command.option(IntegerRange("jobs", "j", "Parallel jobs", 1, 1, 8));
+
+  const [parsed, err] = command.parse(["--format", "json", "--jobs", "4"]);
+  if (err !== nil) {
+    fmt.Println("unexpected parse error: " + err.Error());
+    return;
+  }
+  fmt.Printf("format=%s jobs=%d\n", parsed.text("format"), parsed.integer("jobs"));
+}

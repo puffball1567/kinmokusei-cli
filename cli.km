@@ -1,0 +1,694 @@
+import go fmt from "fmt";
+import go strconv from "strconv";
+import go strings from "strings";
+
+enum OptionKind {
+  Flag,
+  Text,
+  Integer,
+  Choice,
+  IntegerRange,
+  TextList,
+  IntegerList,
+}
+
+export struct Option {
+  private name: string;
+  private short: string;
+  private description: string;
+  private kind: OptionKind;
+  private required: boolean;
+  private textDefault: string;
+  private integerDefault: int;
+  private flagDefault: boolean;
+  private choices: string[];
+  private integerMinimum: int;
+  private integerMaximum: int;
+}
+
+export function Flag(name: string, short: string, description: string): Option {
+  return Option {
+    name: name,
+    short: short,
+    description: description,
+    kind: OptionKind.Flag,
+    required: false,
+    textDefault: "",
+    integerDefault: 0,
+    flagDefault: false,
+    choices: [],
+    integerMinimum: 0,
+    integerMaximum: 0,
+  };
+}
+
+export function Text(name: string, short: string, description: string, defaultValue: string): Option {
+  return Option {
+    name: name,
+    short: short,
+    description: description,
+    kind: OptionKind.Text,
+    required: false,
+    textDefault: defaultValue,
+    integerDefault: 0,
+    flagDefault: false,
+    choices: [],
+    integerMinimum: 0,
+    integerMaximum: 0,
+  };
+}
+
+export function RequiredText(name: string, short: string, description: string): Option {
+  return Option {
+    name: name,
+    short: short,
+    description: description,
+    kind: OptionKind.Text,
+    required: true,
+    textDefault: "",
+    integerDefault: 0,
+    flagDefault: false,
+    choices: [],
+    integerMinimum: 0,
+    integerMaximum: 0,
+  };
+}
+
+export function Integer(name: string, short: string, description: string, defaultValue: int): Option {
+  return Option {
+    name: name,
+    short: short,
+    description: description,
+    kind: OptionKind.Integer,
+    required: false,
+    textDefault: "",
+    integerDefault: defaultValue,
+    flagDefault: false,
+    choices: [],
+    integerMinimum: 0,
+    integerMaximum: 0,
+  };
+}
+
+export function RequiredInteger(name: string, short: string, description: string): Option {
+  return Option {
+    name: name,
+    short: short,
+    description: description,
+    kind: OptionKind.Integer,
+    required: true,
+    textDefault: "",
+    integerDefault: 0,
+    flagDefault: false,
+    choices: [],
+    integerMinimum: 0,
+    integerMaximum: 0,
+  };
+}
+
+export function Choice(name: string, short: string, description: string, choices: string[], defaultValue: string): Option {
+  return Option {
+    name: name,
+    short: short,
+    description: description,
+    kind: OptionKind.Choice,
+    required: false,
+    textDefault: defaultValue,
+    integerDefault: 0,
+    flagDefault: false,
+    choices: choices,
+    integerMinimum: 0,
+    integerMaximum: 0,
+  };
+}
+
+export function RequiredChoice(name: string, short: string, description: string, choices: string[]): Option {
+  return Option {
+    name: name,
+    short: short,
+    description: description,
+    kind: OptionKind.Choice,
+    required: true,
+    textDefault: "",
+    integerDefault: 0,
+    flagDefault: false,
+    choices: choices,
+    integerMinimum: 0,
+    integerMaximum: 0,
+  };
+}
+
+export function IntegerRange(name: string, short: string, description: string, defaultValue: int, minimum: int, maximum: int): Option {
+  return Option {
+    name: name,
+    short: short,
+    description: description,
+    kind: OptionKind.IntegerRange,
+    required: false,
+    textDefault: "",
+    integerDefault: defaultValue,
+    flagDefault: false,
+    choices: [],
+    integerMinimum: minimum,
+    integerMaximum: maximum,
+  };
+}
+
+export function RequiredIntegerRange(name: string, short: string, description: string, minimum: int, maximum: int): Option {
+  return Option {
+    name: name,
+    short: short,
+    description: description,
+    kind: OptionKind.IntegerRange,
+    required: true,
+    textDefault: "",
+    integerDefault: 0,
+    flagDefault: false,
+    choices: [],
+    integerMinimum: minimum,
+    integerMaximum: maximum,
+  };
+}
+
+export function TextList(name: string, short: string, description: string): Option {
+  return Option {
+    name: name,
+    short: short,
+    description: description,
+    kind: OptionKind.TextList,
+    required: false,
+    textDefault: "",
+    integerDefault: 0,
+    flagDefault: false,
+    choices: [],
+    integerMinimum: 0,
+    integerMaximum: 0,
+  };
+}
+
+export function RequiredTextList(name: string, short: string, description: string): Option {
+  return Option {
+    name: name,
+    short: short,
+    description: description,
+    kind: OptionKind.TextList,
+    required: true,
+    textDefault: "",
+    integerDefault: 0,
+    flagDefault: false,
+    choices: [],
+    integerMinimum: 0,
+    integerMaximum: 0,
+  };
+}
+
+export function IntegerList(name: string, short: string, description: string): Option {
+  return Option {
+    name: name,
+    short: short,
+    description: description,
+    kind: OptionKind.IntegerList,
+    required: false,
+    textDefault: "",
+    integerDefault: 0,
+    flagDefault: false,
+    choices: [],
+    integerMinimum: 0,
+    integerMaximum: 0,
+  };
+}
+
+export function RequiredIntegerList(name: string, short: string, description: string): Option {
+  return Option {
+    name: name,
+    short: short,
+    description: description,
+    kind: OptionKind.IntegerList,
+    required: true,
+    textDefault: "",
+    integerDefault: 0,
+    flagDefault: false,
+    choices: [],
+    integerMinimum: 0,
+    integerMaximum: 0,
+  };
+}
+
+export struct ParseResult {
+  public command: string;
+  public commandPath: string[];
+  public positionals: string[];
+  public helpRequested: boolean;
+  public versionRequested: boolean;
+  private textValues: Map<string, string>;
+  private integerValues: Map<string, int>;
+  private flagValues: Map<string, boolean>;
+  private textListValues: Map<string, string[]>;
+  private integerListValues: Map<string, int[]>;
+  private provided: Map<string, boolean>;
+
+  public function has(name: string): boolean {
+    const [value, found] = this.provided[name];
+    return found && value;
+  }
+
+  public function text(name: string): string {
+    const [value, _] = this.textValues[name];
+    return value;
+  }
+
+  public function integer(name: string): int {
+    const [value, _] = this.integerValues[name];
+    return value;
+  }
+
+  public function flag(name: string): boolean {
+    const [value, _] = this.flagValues[name];
+    return value;
+  }
+
+  public function texts(name: string): string[] {
+    const [value, _] = this.textListValues[name];
+    return value;
+  }
+
+  public function integers(name: string): int[] {
+    const [value, _] = this.integerListValues[name];
+    return value;
+  }
+}
+
+export class Command {
+  public name: string;
+  public description: string;
+  private version: string;
+  private options: Option[];
+  private commands: Command[];
+  private minimumArguments: int;
+  private maximumArguments: int;
+
+  constructor(name: string, description: string) {
+    this.name = name;
+    this.description = description;
+    this.version = "";
+    this.options = [];
+    this.commands = [];
+    this.minimumArguments = 0;
+    this.maximumArguments = -1;
+  }
+
+  public function setVersion(version: string): void {
+    this.version = version;
+  }
+
+  public function option(spec: Option): void {
+    this.options = append(this.options, spec);
+  }
+
+  public function subcommand(command: Command): void {
+    this.commands = append(this.commands, command);
+  }
+
+  public function setArgumentRange(minimum: int, maximum: int): void {
+    this.minimumArguments = minimum;
+    this.maximumArguments = maximum;
+  }
+
+  public function parse(args: string[]): Result<ParseResult> {
+    this.validate()?;
+
+    if (len(args) > 0 && !strings.HasPrefix(args[0], "-") && len(this.commands) > 0) {
+      for (const command of this.commands) {
+        if (command.name == args[0]) {
+          const parsed = command.parse(args[1:])?;
+          let commandPath: string[] = [];
+          commandPath = append(commandPath, this.name);
+          for (const part of parsed.commandPath) {
+            commandPath = append(commandPath, part);
+          }
+          parsed.commandPath = commandPath;
+          return ok(parsed);
+        }
+      }
+      return fail(fmt.Errorf("unknown command %q", args[0]));
+    }
+
+    return this.parseOwn(args);
+  }
+
+  public function help(): string {
+    let output = "Usage: " + this.name;
+    if (len(this.options) > 0) {
+      output += " [options]";
+    }
+    if (len(this.commands) > 0) {
+      output += " <command>";
+    }
+    if (this.maximumArguments != 0) {
+      if (this.minimumArguments > 0) {
+        output += " <arguments>";
+      } else {
+        output += " [arguments]";
+      }
+    }
+    output += "\n";
+
+    if (this.description != "") {
+      output += "\n" + this.description + "\n";
+    }
+
+    if (len(this.commands) > 0) {
+      output += "\nCommands:\n";
+      for (const command of this.commands) {
+        output += "  " + command.name;
+        if (command.description != "") {
+          output += "\t" + command.description;
+        }
+        output += "\n";
+      }
+    }
+
+    output += "\nOptions:\n";
+    output += "  -h, --help\tShow help\n";
+    if (this.version != "") {
+      output += "      --version\tShow version\n";
+    }
+    for (const spec of this.options) {
+      output += "  ";
+      if (spec.short != "") {
+        output += "-" + spec.short + ", ";
+      } else {
+        output += "    ";
+      }
+      output += "--" + spec.name;
+      if (spec.kind == OptionKind.Text) {
+        output += " <text>";
+      } else if (spec.kind == OptionKind.Integer) {
+        output += " <integer>";
+      } else if (spec.kind == OptionKind.Choice) {
+        output += " <" + strings.Join(spec.choices, "|") + ">";
+      } else if (spec.kind == OptionKind.IntegerRange) {
+        output += " <integer:" + strconv.Itoa(spec.integerMinimum) + ".." + strconv.Itoa(spec.integerMaximum) + ">";
+      } else if (spec.kind == OptionKind.TextList) {
+        output += " <text>...";
+      } else if (spec.kind == OptionKind.IntegerList) {
+        output += " <integer>...";
+      }
+      if (spec.description != "") {
+        output += "\t" + spec.description;
+      }
+      if (spec.required) {
+        output += " (required)";
+      }
+      output += "\n";
+    }
+    return output;
+  }
+
+  private function validate(): Result<void> {
+    if (strings.TrimSpace(this.name) == "") {
+      return fail(fmt.Errorf("command name must not be empty"));
+    }
+    if (strings.TrimSpace(this.name) != this.name || strings.HasPrefix(this.name, "-") || strings.ContainsAny(this.name, " \t\r\n/\\")) {
+      return fail(fmt.Errorf("invalid command name %q", this.name));
+    }
+    if (this.minimumArguments < 0) {
+      return fail(fmt.Errorf("minimum argument count must not be negative"));
+    }
+    if (this.maximumArguments < -1) {
+      return fail(fmt.Errorf("maximum argument count must be -1 or greater"));
+    }
+    if (this.maximumArguments >= 0 && this.maximumArguments < this.minimumArguments) {
+      return fail(fmt.Errorf("maximum argument count must not be less than minimum"));
+    }
+
+    const longNames = makeMap[string, boolean]();
+    const shortNames = makeMap[string, boolean]();
+    longNames["help"] = true;
+    longNames["version"] = true;
+    shortNames["h"] = true;
+
+    for (const spec of this.options) {
+      if (strings.TrimSpace(spec.name) == "" || strings.TrimSpace(spec.name) != spec.name || strings.HasPrefix(spec.name, "-") || strings.ContainsAny(spec.name, " \t\r\n=/\\")) {
+        return fail(fmt.Errorf("invalid option name %q", spec.name));
+      }
+      const [_, duplicateLong] = longNames[spec.name];
+      if (duplicateLong) {
+        return fail(fmt.Errorf("duplicate option --%s", spec.name));
+      }
+      longNames[spec.name] = true;
+
+      if (spec.short != "") {
+        if (len(spec.short) != 1 || strings.TrimSpace(spec.short) != spec.short || strings.HasPrefix(spec.short, "-")) {
+          return fail(fmt.Errorf("invalid short option %q for --%s", spec.short, spec.name));
+        }
+        const [_, duplicateShort] = shortNames[spec.short];
+        if (duplicateShort) {
+          return fail(fmt.Errorf("duplicate short option -%s", spec.short));
+        }
+        shortNames[spec.short] = true;
+      }
+
+      if (spec.kind == OptionKind.Choice) {
+        if (len(spec.choices) == 0) {
+          return fail(fmt.Errorf("option --%s must define at least one choice", spec.name));
+        }
+        const choiceNames = makeMap[string, boolean]();
+        for (const choice of spec.choices) {
+          const [_, duplicateChoice] = choiceNames[choice];
+          if (duplicateChoice) {
+            return fail(fmt.Errorf("duplicate choice %q for --%s", choice, spec.name));
+          }
+          choiceNames[choice] = true;
+        }
+        if (!spec.required) {
+          const [_, defaultAllowed] = choiceNames[spec.textDefault];
+          if (!defaultAllowed) {
+            return fail(fmt.Errorf("default value %q for --%s is not an allowed choice", spec.textDefault, spec.name));
+          }
+        }
+      }
+      if (spec.kind == OptionKind.IntegerRange) {
+        if (spec.integerMaximum < spec.integerMinimum) {
+          return fail(fmt.Errorf("maximum value for --%s must not be less than minimum", spec.name));
+        }
+        if (!spec.required && (spec.integerDefault < spec.integerMinimum || spec.integerDefault > spec.integerMaximum)) {
+          return fail(fmt.Errorf("default value %d for --%s is outside %d..%d", spec.integerDefault, spec.name, spec.integerMinimum, spec.integerMaximum));
+        }
+      }
+    }
+
+    const commandNames = makeMap[string, boolean]();
+    for (const command of this.commands) {
+      if (strings.TrimSpace(command.name) == "" || strings.TrimSpace(command.name) != command.name || strings.HasPrefix(command.name, "-") || strings.ContainsAny(command.name, " \t\r\n/\\")) {
+        return fail(fmt.Errorf("invalid command name %q", command.name));
+      }
+      const [_, duplicate] = commandNames[command.name];
+      if (duplicate) {
+        return fail(fmt.Errorf("duplicate command %q", command.name));
+      }
+      commandNames[command.name] = true;
+      command.validate()?;
+    }
+    return ok();
+  }
+
+  private function parseOwn(args: string[]): Result<ParseResult> {
+    const textValues = makeMap[string, string]();
+    const integerValues = makeMap[string, int]();
+    const flagValues = makeMap[string, boolean]();
+    const textListValues = makeMap[string, string[]]();
+    const integerListValues = makeMap[string, int[]]();
+    const provided = makeMap[string, boolean]();
+
+    for (const spec of this.options) {
+      if (spec.kind == OptionKind.Text || spec.kind == OptionKind.Choice) {
+        textValues[spec.name] = spec.textDefault;
+      } else if (spec.kind == OptionKind.Integer || spec.kind == OptionKind.IntegerRange) {
+        integerValues[spec.name] = spec.integerDefault;
+      } else if (spec.kind == OptionKind.TextList) {
+        textListValues[spec.name] = [];
+      } else if (spec.kind == OptionKind.IntegerList) {
+        integerListValues[spec.name] = [];
+      } else {
+        flagValues[spec.name] = spec.flagDefault;
+      }
+      provided[spec.name] = false;
+    }
+
+    let positionals: string[] = [];
+    let helpRequested = false;
+    let versionRequested = false;
+    let optionsEnded = false;
+    let index = 0;
+
+    while (index < len(args)) {
+      const argument = args[index];
+
+      if (optionsEnded) {
+        positionals = append(positionals, argument);
+        index++;
+        continue;
+      }
+      if (argument == "--") {
+        optionsEnded = true;
+        index++;
+        continue;
+      }
+      if (argument == "--help" || argument == "-h") {
+        helpRequested = true;
+        index++;
+        continue;
+      }
+      if (argument == "--version") {
+        if (this.version == "") {
+          return fail(fmt.Errorf("unknown option --version"));
+        }
+        versionRequested = true;
+        index++;
+        continue;
+      }
+
+      let optionName = "";
+      let inlineValue = "";
+      let hasInlineValue = false;
+      if (strings.HasPrefix(argument, "--")) {
+        const body = argument[2:];
+        const separator = strings.Index(body, "=");
+        if (separator >= 0) {
+          optionName = body[:separator];
+          inlineValue = body[separator + 1:];
+          hasInlineValue = true;
+        } else {
+          optionName = body;
+        }
+      } else if (strings.HasPrefix(argument, "-") && argument != "-") {
+        const short = argument[1:];
+        if (len(short) != 1) {
+          return fail(fmt.Errorf("short options cannot be grouped: %s", argument));
+        }
+        for (const spec of this.options) {
+          if (spec.short == short) {
+            optionName = spec.name;
+          }
+        }
+        if (optionName == "") {
+          return fail(fmt.Errorf("unknown option %s", argument));
+        }
+      } else {
+        positionals = append(positionals, argument);
+        index++;
+        continue;
+      }
+
+      let found = false;
+      let selected = Option {
+        name: "",
+        short: "",
+        description: "",
+        kind: OptionKind.Flag,
+        required: false,
+        textDefault: "",
+        integerDefault: 0,
+        flagDefault: false,
+        choices: [],
+        integerMinimum: 0,
+        integerMaximum: 0,
+      };
+      for (const spec of this.options) {
+        if (spec.name == optionName) {
+          selected = spec;
+          found = true;
+        }
+      }
+      if (!found) {
+        return fail(fmt.Errorf("unknown option --%s", optionName));
+      }
+      if (provided[optionName] && selected.kind != OptionKind.TextList && selected.kind != OptionKind.IntegerList) {
+        return fail(fmt.Errorf("option --%s may only be specified once", optionName));
+      }
+
+      if (selected.kind == OptionKind.Flag) {
+        if (hasInlineValue) {
+          const [parsed, parseError] = strconv.ParseBool(inlineValue);
+          if (parseError !== nil) {
+            return fail(fmt.Errorf("invalid value %q for --%s: expected boolean", inlineValue, optionName));
+          }
+          flagValues[optionName] = parsed;
+        } else {
+          flagValues[optionName] = true;
+        }
+      } else {
+        let value = inlineValue;
+        if (!hasInlineValue) {
+          index++;
+          if (index >= len(args)) {
+            return fail(fmt.Errorf("option --%s requires a value", optionName));
+          }
+          value = args[index];
+        }
+        if (selected.kind == OptionKind.Text || selected.kind == OptionKind.Choice) {
+          if (selected.kind == OptionKind.Choice) {
+            let allowed = false;
+            for (const choice of selected.choices) {
+              if (choice == value) {
+                allowed = true;
+              }
+            }
+            if (!allowed) {
+              return fail(fmt.Errorf("invalid value %q for --%s: expected one of %s", value, optionName, strings.Join(selected.choices, ", ")));
+            }
+          }
+          textValues[optionName] = value;
+        } else if (selected.kind == OptionKind.TextList) {
+          textListValues[optionName] = append(textListValues[optionName], value);
+        } else {
+          const [parsedInteger, parseError] = strconv.Atoi(value);
+          if (parseError !== nil) {
+            return fail(fmt.Errorf("invalid value %q for --%s: expected integer", value, optionName));
+          }
+          if (selected.kind == OptionKind.IntegerRange && (parsedInteger < selected.integerMinimum || parsedInteger > selected.integerMaximum)) {
+            return fail(fmt.Errorf("invalid value %d for --%s: expected %d..%d", parsedInteger, optionName, selected.integerMinimum, selected.integerMaximum));
+          }
+          if (selected.kind == OptionKind.IntegerList) {
+            integerListValues[optionName] = append(integerListValues[optionName], parsedInteger);
+          } else {
+            integerValues[optionName] = parsedInteger;
+          }
+        }
+      }
+      provided[optionName] = true;
+      index++;
+    }
+
+    if (!helpRequested && !versionRequested) {
+      for (const spec of this.options) {
+        if (spec.required && !provided[spec.name]) {
+          return fail(fmt.Errorf("required option --%s is missing", spec.name));
+        }
+      }
+      if (len(positionals) < this.minimumArguments) {
+        return fail(fmt.Errorf("expected at least %d positional argument(s), got %d", this.minimumArguments, len(positionals)));
+      }
+      if (this.maximumArguments >= 0 && len(positionals) > this.maximumArguments) {
+        return fail(fmt.Errorf("expected at most %d positional argument(s), got %d", this.maximumArguments, len(positionals)));
+      }
+    }
+
+    let commandPath: string[] = [];
+    commandPath = append(commandPath, this.name);
+    return ok(ParseResult {
+      command: this.name,
+      commandPath: commandPath,
+      positionals: positionals,
+      helpRequested: helpRequested,
+      versionRequested: versionRequested,
+      textValues: textValues,
+      integerValues: integerValues,
+      flagValues: flagValues,
+      textListValues: textListValues,
+      integerListValues: integerListValues,
+      provided: provided,
+    });
+  }
+}
