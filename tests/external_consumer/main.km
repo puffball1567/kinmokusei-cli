@@ -1,4 +1,4 @@
-import { Choice, Command, IntegerRange } from "github.com/puffball1567/kinmokusei-cli";
+import { Choice, Command, IntegerRange } from "kinmokusei-cli";
 import go fmt from "fmt";
 
 function main(): void {

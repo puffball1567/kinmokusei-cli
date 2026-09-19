@@ -19,5 +19,5 @@ public contract rather than generated implementation details.
 | Subcommands | direct, nested, full command paths, child options and child help | unknown, duplicate and invalid child commands |
 | Result access | declared defaults and explicit values | unknown names return typed zero values |
 | Executable examples | successful builds, basic output and advanced subcommand output | type/range failure, missing required option, diagnostics and exit status |
-| External package | independent app imports the public module path through a v0.4.1 local replacement, then checks and builds | package metadata, version and exported-source resolution failures stop the suite |
+| External package | independent app installs through a v0.4.3 local replacement, imports `kinmokusei-cli`, then checks and builds | alias, package metadata, version and exported-source resolution failures stop the suite |
 | Robustness | seeded and generated argument streams | arbitrary command, option and short-name strings must not panic |

@@ -4,12 +4,15 @@
 provides a Kinmokusei-first API while keeping process I/O and exit behavior
 under application control.
 
-The project is under active development for its first release.
+The project is under active development.
 
 ## Requirements
 
-- Kinmokusei v0.4.1 or later
+- Kinmokusei v0.4.3 or later for automatic short imports
 - Go 1.23 or later
+
+The library itself remains compatible with Kinmokusei v0.4.1. Applications
+using v0.4.1 or v0.4.2 must import the canonical module path instead.
 
 ## Features
 
@@ -31,11 +34,11 @@ The project is under active development for its first release.
 Add the tagged package to a Kinmokusei application and import its public module:
 
 ```sh
-keika deps add github.com/puffball1567/kinmokusei-cli@v0.1.0
+keika deps add github.com/puffball1567/kinmokusei-cli@v0.1.1
 ```
 
 ```ts
-import { Command, Flag, IntegerRange, RequiredText } from "github.com/puffball1567/kinmokusei-cli";
+import { Command, Flag, IntegerRange, RequiredText } from "kinmokusei-cli";
 import go fmt from "fmt";
 import go os from "os";
 
