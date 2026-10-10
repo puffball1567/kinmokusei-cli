@@ -162,3 +162,8 @@ source.
 ## License
 
 Apache-2.0
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development, pull request,
+release, and hotfix rules.
