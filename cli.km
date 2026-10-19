@@ -13,20 +13,20 @@ enum OptionKind {
 }
 
 export struct Option {
-  private name: string;
-  private short: string;
-  private description: string;
+  private name: bstring;
+  private short: bstring;
+  private description: bstring;
   private kind: OptionKind;
   private required: boolean;
-  private textDefault: string;
+  private textDefault: bstring;
   private integerDefault: int;
   private flagDefault: boolean;
-  private choices: string[];
+  private choices: bstring[];
   private integerMinimum: int;
   private integerMaximum: int;
 }
 
-export function Flag(name: string, short: string, description: string): Option {
+export function Flag(name: bstring, short: bstring, description: bstring): Option {
   return Option {
     name: name,
     short: short,
@@ -42,7 +42,7 @@ export function Flag(name: string, short: string, description: string): Option {
   };
 }
 
-export function Text(name: string, short: string, description: string, defaultValue: string): Option {
+export function Text(name: bstring, short: bstring, description: bstring, defaultValue: bstring): Option {
   return Option {
     name: name,
     short: short,
@@ -58,7 +58,7 @@ export function Text(name: string, short: string, description: string, defaultVa
   };
 }
 
-export function RequiredText(name: string, short: string, description: string): Option {
+export function RequiredText(name: bstring, short: bstring, description: bstring): Option {
   return Option {
     name: name,
     short: short,
@@ -74,7 +74,7 @@ export function RequiredText(name: string, short: string, description: string): 
   };
 }
 
-export function Integer(name: string, short: string, description: string, defaultValue: int): Option {
+export function Integer(name: bstring, short: bstring, description: bstring, defaultValue: int): Option {
   return Option {
     name: name,
     short: short,
@@ -90,7 +90,7 @@ export function Integer(name: string, short: string, description: string, defaul
   };
 }
 
-export function RequiredInteger(name: string, short: string, description: string): Option {
+export function RequiredInteger(name: bstring, short: bstring, description: bstring): Option {
   return Option {
     name: name,
     short: short,
@@ -106,7 +106,7 @@ export function RequiredInteger(name: string, short: string, description: string
   };
 }
 
-export function Choice(name: string, short: string, description: string, choices: string[], defaultValue: string): Option {
+export function Choice(name: bstring, short: bstring, description: bstring, choices: bstring[], defaultValue: bstring): Option {
   return Option {
     name: name,
     short: short,
@@ -122,7 +122,7 @@ export function Choice(name: string, short: string, description: string, choices
   };
 }
 
-export function RequiredChoice(name: string, short: string, description: string, choices: string[]): Option {
+export function RequiredChoice(name: bstring, short: bstring, description: bstring, choices: bstring[]): Option {
   return Option {
     name: name,
     short: short,
@@ -138,7 +138,7 @@ export function RequiredChoice(name: string, short: string, description: string,
   };
 }
 
-export function IntegerRange(name: string, short: string, description: string, defaultValue: int, minimum: int, maximum: int): Option {
+export function IntegerRange(name: bstring, short: bstring, description: bstring, defaultValue: int, minimum: int, maximum: int): Option {
   return Option {
     name: name,
     short: short,
@@ -154,7 +154,7 @@ export function IntegerRange(name: string, short: string, description: string, d
   };
 }
 
-export function RequiredIntegerRange(name: string, short: string, description: string, minimum: int, maximum: int): Option {
+export function RequiredIntegerRange(name: bstring, short: bstring, description: bstring, minimum: int, maximum: int): Option {
   return Option {
     name: name,
     short: short,
@@ -170,7 +170,7 @@ export function RequiredIntegerRange(name: string, short: string, description: s
   };
 }
 
-export function TextList(name: string, short: string, description: string): Option {
+export function TextList(name: bstring, short: bstring, description: bstring): Option {
   return Option {
     name: name,
     short: short,
@@ -186,7 +186,7 @@ export function TextList(name: string, short: string, description: string): Opti
   };
 }
 
-export function RequiredTextList(name: string, short: string, description: string): Option {
+export function RequiredTextList(name: bstring, short: bstring, description: bstring): Option {
   return Option {
     name: name,
     short: short,
@@ -202,7 +202,7 @@ export function RequiredTextList(name: string, short: string, description: strin
   };
 }
 
-export function IntegerList(name: string, short: string, description: string): Option {
+export function IntegerList(name: bstring, short: bstring, description: bstring): Option {
   return Option {
     name: name,
     short: short,
@@ -218,7 +218,7 @@ export function IntegerList(name: string, short: string, description: string): O
   };
 }
 
-export function RequiredIntegerList(name: string, short: string, description: string): Option {
+export function RequiredIntegerList(name: bstring, short: bstring, description: bstring): Option {
   return Option {
     name: name,
     short: short,
@@ -235,59 +235,59 @@ export function RequiredIntegerList(name: string, short: string, description: st
 }
 
 export struct ParseResult {
-  public command: string;
-  public commandPath: string[];
-  public positionals: string[];
+  public command: bstring;
+  public commandPath: bstring[];
+  public positionals: bstring[];
   public helpRequested: boolean;
   public versionRequested: boolean;
-  private textValues: Map<string, string>;
-  private integerValues: Map<string, int>;
-  private flagValues: Map<string, boolean>;
-  private textListValues: Map<string, string[]>;
-  private integerListValues: Map<string, int[]>;
-  private provided: Map<string, boolean>;
+  private textValues: Map<bstring, bstring>;
+  private integerValues: Map<bstring, int>;
+  private flagValues: Map<bstring, boolean>;
+  private textListValues: Map<bstring, bstring[]>;
+  private integerListValues: Map<bstring, int[]>;
+  private provided: Map<bstring, boolean>;
 
-  public function has(name: string): boolean {
+  public function has(name: bstring): boolean {
     const [value, found] = this.provided[name];
     return found && value;
   }
 
-  public function text(name: string): string {
+  public function text(name: bstring): bstring {
     const [value, _] = this.textValues[name];
     return value;
   }
 
-  public function integer(name: string): int {
+  public function integer(name: bstring): int {
     const [value, _] = this.integerValues[name];
     return value;
   }
 
-  public function flag(name: string): boolean {
+  public function flag(name: bstring): boolean {
     const [value, _] = this.flagValues[name];
     return value;
   }
 
-  public function texts(name: string): string[] {
+  public function texts(name: bstring): bstring[] {
     const [value, _] = this.textListValues[name];
     return value;
   }
 
-  public function integers(name: string): int[] {
+  public function integers(name: bstring): int[] {
     const [value, _] = this.integerListValues[name];
     return value;
   }
 }
 
 export class Command {
-  public name: string;
-  public description: string;
-  private version: string;
+  public name: bstring;
+  public description: bstring;
+  private version: bstring;
   private options: Option[];
   private commands: Command[];
   private minimumArguments: int;
   private maximumArguments: int;
 
-  constructor(name: string, description: string) {
+  constructor(name: bstring, description: bstring) {
     this.name = name;
     this.description = description;
     this.version = "";
@@ -297,7 +297,7 @@ export class Command {
     this.maximumArguments = -1;
   }
 
-  public function setVersion(version: string): void {
+  public function setVersion(version: bstring): void {
     this.version = version;
   }
 
@@ -314,14 +314,14 @@ export class Command {
     this.maximumArguments = maximum;
   }
 
-  public function parse(args: string[]): Result<ParseResult> {
+  public function parse(args: bstring[]): Result<ParseResult> {
     this.validate()?;
 
     if (len(args) > 0 && !strings.HasPrefix(args[0], "-") && len(this.commands) > 0) {
       for (const command of this.commands) {
         if (command.name == args[0]) {
           const parsed = command.parse(args[1:])?;
-          let commandPath: string[] = [];
+          let commandPath: bstring[] = [];
           commandPath = append(commandPath, this.name);
           for (const part of parsed.commandPath) {
             commandPath = append(commandPath, part);
@@ -336,7 +336,7 @@ export class Command {
     return this.parseOwn(args);
   }
 
-  public function help(): string {
+  public function help(): bstring {
     let output = "Usage: " + this.name;
     if (len(this.options) > 0) {
       output += " [options]";
@@ -422,8 +422,8 @@ export class Command {
       return fail(fmt.Errorf("maximum argument count must not be less than minimum"));
     }
 
-    const longNames = makeMap[string, boolean]();
-    const shortNames = makeMap[string, boolean]();
+    const longNames = makeMap[bstring, boolean]();
+    const shortNames = makeMap[bstring, boolean]();
     longNames["help"] = true;
     longNames["version"] = true;
     shortNames["h"] = true;
@@ -453,7 +453,7 @@ export class Command {
         if (len(spec.choices) == 0) {
           return fail(fmt.Errorf("option --%s must define at least one choice", spec.name));
         }
-        const choiceNames = makeMap[string, boolean]();
+        const choiceNames = makeMap[bstring, boolean]();
         for (const choice of spec.choices) {
           const [_, duplicateChoice] = choiceNames[choice];
           if (duplicateChoice) {
@@ -478,7 +478,7 @@ export class Command {
       }
     }
 
-    const commandNames = makeMap[string, boolean]();
+    const commandNames = makeMap[bstring, boolean]();
     for (const command of this.commands) {
       if (strings.TrimSpace(command.name) == "" || strings.TrimSpace(command.name) != command.name || strings.HasPrefix(command.name, "-") || strings.ContainsAny(command.name, " \t\r\n/\\")) {
         return fail(fmt.Errorf("invalid command name %q", command.name));
@@ -493,13 +493,13 @@ export class Command {
     return ok();
   }
 
-  private function parseOwn(args: string[]): Result<ParseResult> {
-    const textValues = makeMap[string, string]();
-    const integerValues = makeMap[string, int]();
-    const flagValues = makeMap[string, boolean]();
-    const textListValues = makeMap[string, string[]]();
-    const integerListValues = makeMap[string, int[]]();
-    const provided = makeMap[string, boolean]();
+  private function parseOwn(args: bstring[]): Result<ParseResult> {
+    const textValues = makeMap[bstring, bstring]();
+    const integerValues = makeMap[bstring, int]();
+    const flagValues = makeMap[bstring, boolean]();
+    const textListValues = makeMap[bstring, bstring[]]();
+    const integerListValues = makeMap[bstring, int[]]();
+    const provided = makeMap[bstring, boolean]();
 
     for (const spec of this.options) {
       if (spec.kind == OptionKind.Text || spec.kind == OptionKind.Choice) {
@@ -516,7 +516,7 @@ export class Command {
       provided[spec.name] = false;
     }
 
-    let positionals: string[] = [];
+    let positionals: bstring[] = [];
     let helpRequested = false;
     let versionRequested = false;
     let optionsEnded = false;
@@ -549,8 +549,8 @@ export class Command {
         continue;
       }
 
-      let optionName = "";
-      let inlineValue = "";
+      let optionName: bstring = "";
+      let inlineValue: bstring = "";
       let hasInlineValue = false;
       if (strings.HasPrefix(argument, "--")) {
         const body = argument[2:];
@@ -675,7 +675,7 @@ export class Command {
       }
     }
 
-    let commandPath: string[] = [];
+    let commandPath: bstring[] = [];
     commandPath = append(commandPath, this.name);
     return ok(ParseResult {
       command: this.name,
