@@ -1,5 +1,13 @@
 # kinmokusei-cli
 
+## Compatibility with Kinmokusei v0.4.7
+
+This minor release requires Kinmokusei v0.4.7 or newer. Text parameters,
+results, and collections use `bstring` to preserve the previous byte-oriented
+behavior of Go strings. Scalar verified `string` arguments can still widen to
+`bstring`; collections must be declared as `bstring[]` or copied explicitly.
+Use checked `string(raw)` conversion when your application needs verified UTF-8.
+
 `kinmokusei-cli` is a command-line argument parser written for Kinmokusei. It
 provides a Kinmokusei-first API while keeping process I/O and exit behavior
 under application control.
@@ -8,11 +16,10 @@ The project is under active development.
 
 ## Requirements
 
-- Kinmokusei v0.4.3 or later for automatic short imports
+- Kinmokusei v0.4.7 or later for automatic short imports
 - Go 1.23 or later
 
-The library itself remains compatible with Kinmokusei v0.4.1. Applications
-using v0.4.1 or v0.4.2 must import the canonical module path instead.
+Use the 0.1.x library series with older Kinmokusei compilers.
 
 ## Features
 
@@ -34,7 +41,7 @@ using v0.4.1 or v0.4.2 must import the canonical module path instead.
 Add the tagged package to a Kinmokusei application and import its public module:
 
 ```sh
-keika deps add github.com/puffball1567/kinmokusei-cli@v0.1.1
+keika deps add github.com/puffball1567/kinmokusei-cli@v0.2.0
 ```
 
 ```ts
