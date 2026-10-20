@@ -1,14 +1,20 @@
-import { Choice, Command, IntegerRange } from "kinmokusei-cli";
+import { Choice, Command, IntegerRange, Text } from "kinmokusei-cli";
 import go fmt from "fmt";
 
 function main(): void {
-  const command = new Command("consumer", "External package test");
+  const verifiedName: string = "consumer";
+  const command = new Command(verifiedName, "External package test");
   command.option(Choice("format", "f", "Output format", ["text", "json"], "text"));
   command.option(IntegerRange("jobs", "j", "Parallel jobs", 1, 1, 8));
 
+  command.option(Text("raw", "", "Byte-preserving text", b"\xff"));
   const [parsed, err] = command.parse(["--format", "json", "--jobs", "4"]);
   if (err !== nil) {
     fmt.Println("unexpected parse error: " + err.Error());
+    return;
+  }
+  if (parsed.text("raw") != b"\xff") {
+    fmt.Println("raw text was changed");
     return;
   }
   fmt.Printf("format=%s jobs=%d\n", parsed.text("format"), parsed.integer("jobs"));
