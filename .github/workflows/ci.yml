@@ -49,7 +49,12 @@ jobs:
   test-suite:
     needs: classify-flow
     if: ${{ needs.classify-flow.outputs.mode == 'full' }}
+    name: Kinmokusei ${{ matrix.kinmokusei }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        kinmokusei: ["0.4.7", "0.4.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -57,7 +62,7 @@ jobs:
           go-version: "1.23.x"
           cache: false
       - name: Install Kinmokusei
-        run: go install github.com/puffball1567/kinmokusei/cmd/keika@v0.4.8
+        run: go install github.com/puffball1567/kinmokusei/cmd/keika@v${{ matrix.kinmokusei }}
       - name: Test
         run: KEIKA="$(go env GOPATH)/bin/keika" sh scripts/test.sh
 
