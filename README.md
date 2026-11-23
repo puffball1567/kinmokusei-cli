@@ -42,7 +42,7 @@ Use the 0.1.x library series with older Kinmokusei compilers.
 Add the tagged package to a Kinmokusei application and import its public module:
 
 ```sh
-keika deps add github.com/puffball1567/kinmokusei-cli@v0.2.0
+keika deps add github.com/puffball1567/kinmokusei-cli@v0.2.1
 ```
 
 ```ts
