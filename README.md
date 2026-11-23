@@ -1,10 +1,11 @@
 # kinmokusei-cli
 
-## Compatibility with Kinmokusei v0.4.7
+## Compiler compatibility
 
-This minor release requires Kinmokusei v0.4.7 or newer. Text parameters,
-results, and collections use `bstring` to preserve the previous byte-oriented
-behavior of Go strings. Scalar verified `string` arguments can still widen to
+Requires Kinmokusei v0.4.7 or newer. CI tests both v0.4.7 and v0.4.12.
+
+Text parameters, results, and collections use `bstring` to preserve the previous
+byte-oriented behavior of Go strings. Scalar verified `string` arguments can still widen to
 `bstring`; collections must be declared as `bstring[]` or copied explicitly.
 Use checked `string(raw)` conversion when your application needs verified UTF-8.
 
@@ -41,7 +42,7 @@ Use the 0.1.x library series with older Kinmokusei compilers.
 Add the tagged package to a Kinmokusei application and import its public module:
 
 ```sh
-keika deps add github.com/puffball1567/kinmokusei-cli@v0.2.0
+keika deps add github.com/puffball1567/kinmokusei-cli@v0.2.1
 ```
 
 ```ts
@@ -164,7 +165,9 @@ KEIKA=keika sh scripts/test.sh
 The test script emits Go into a temporary directory and removes it on exit.
 It also builds an independent application that imports the library through its
 public module path and a local replacement. Generated Go is not maintained as
-source.
+source. The coverage gate requires every source-mapped library statement to
+execute. Compiler runtime helpers and injected non-null panic paths are
+excluded; all tests run against the actual generated Go, including those checks.
 
 ## License
 
