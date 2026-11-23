@@ -21,3 +21,8 @@ public contract rather than generated implementation details.
 | Executable examples | successful builds, basic output and advanced subcommand output | type/range failure, missing required option, diagnostics and exit status |
 | External package | independent app installs through a local replacement with Kinmokusei v0.4.8, imports `kinmokusei-cli`, then checks and builds | alias, package metadata, version and exported-source resolution failures stop the suite |
 | Robustness | seeded and generated argument streams | arbitrary command, option and short-name strings must not panic |
+
+Compiler compatibility is checked with Kinmokusei v0.4.7 and v0.4.12, including
+source checks, generated-Go tests, executable examples and an independent
+short-import consumer. Coverage requires 100% of source-mapped library statements;
+compiler runtime helpers and injected non-null panic paths are excluded.

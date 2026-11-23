@@ -9,21 +9,18 @@ keika_command=${KEIKA:-keika}
 
 cd "$project_dir"
 "$keika_command" deps lock
+GOCACHE="${GOCACHE:-$test_dir/go-cache}" go test "$project_dir/scripts/check_coverage.go" "$project_dir/scripts/check_coverage_test.go"
 "$keika_command" check cli.km
 "$keika_command" check examples/basic/main.km
 "$keika_command" check examples/subcommands/main.km
-"$keika_command" emit-go -package cli -o "$test_dir/cli.go" cli.km
+"$keika_command" emit-go -package cli -o "$test_dir/cli.go" -source-map "$test_dir/cli.map.json" cli.km
 cp tests/*_test.go "$test_dir/"
 
 cd "$test_dir"
 go mod init example.com/kinmokusei-cli-test >/dev/null
 go test -coverprofile="$test_dir/coverage.out" ./...
 go tool cover -func="$test_dir/coverage.out"
-coverage_total=$(go tool cover -func="$test_dir/coverage.out" | awk '/^total:/ { print $3 }')
-if [ "$coverage_total" != "100.0%" ]; then
-  printf 'statement coverage is %s, want 100.0%%\n' "$coverage_total" >&2
-  exit 1
-fi
+go run "$project_dir/scripts/check_coverage.go" -- "$test_dir/cli.go" "$test_dir/cli.map.json" "$test_dir/coverage.out"
 go test -run='^$' -fuzz='^FuzzParseNeverPanics$' -fuzztime=1s
 go test -run='^$' -fuzz='^FuzzDefinitionValidationNeverPanics$' -fuzztime=1s
 
@@ -97,7 +94,7 @@ cp cli.km go.mod kinmokusei.lock kinmokusei.toml LICENSE "$library_dir/"
 "$keika_command" new app --module example.com/kinmokusei-cli-consumer "$consumer_dir"
 cp tests/external_consumer/main.km "$consumer_dir/main.km"
 cd "$consumer_dir"
-"$keika_command" deps add --offline --replace ../library github.com/puffball1567/kinmokusei-cli@v0.2.0
+"$keika_command" deps add --offline --replace ../library github.com/puffball1567/kinmokusei-cli@v0.2.1
 "$keika_command" check
 "$keika_command" build -o "$test_dir/external-consumer-app"
 actual_output=$($test_dir/external-consumer-app)
